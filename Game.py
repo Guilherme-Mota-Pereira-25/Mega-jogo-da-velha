@@ -51,7 +51,7 @@ def main():
         if (board.peek(macroCell_coord).isComplete()):
             # Método para checar se alguém ganho e mudar o estado da board.peek()
             pass
-        state = 1 - state
+        turn = 1 - turn
 
 if __name__ == "__main__":
     main()
