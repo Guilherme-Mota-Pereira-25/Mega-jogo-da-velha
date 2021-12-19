@@ -1,12 +1,24 @@
-
-from Player import *
+import pygame
+from sys import exit
+#from Player import *
 
 def main():
+    #Initialize Pygame     
+    pygame.init()
+    screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
     
-    # Precisa declarar uma board:
-    # board = Board(3)
+    
+    
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            
+        pygame.display.update()
 
-    moves = ["X","O"]
+    
+    """moves = ["X","O"]
     print("Bem vindo ao Mega jogo da velha!\nInicialmente, configure o jogo.")
     valid_input = False
     print()
@@ -51,7 +63,7 @@ def main():
         if (board.peek(macroCell_coord).isComplete()):
             # Método para checar se alguém ganho e mudar o estado da board.peek()
             pass
-        turn = 1 - turn
+        turn = 1 - turn"""
 
 if __name__ == "__main__":
     main()
