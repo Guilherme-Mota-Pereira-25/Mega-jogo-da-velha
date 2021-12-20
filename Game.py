@@ -1,21 +1,106 @@
 import pygame
 from sys import exit
-#from Player import *
+#from Player import *    
+    
+
+def title_screen(screen,clock):
+    #Get the Screen's size
+    height = screen.get_height()
+    width = screen.get_width()
+
+    #Setup font
+    Font = pygame.font.Font(None,60)
+
+
+
+    
+    #Create the elements of the screen
+    #Title
+    title_surface = pygame.image.load('./images/Titulo.png')
+
+    #Start game Button
+    button_Start = pygame.Surface((width/6,height/15))
+    button_Start.fill((50,50,50))
+    inner_Start = pygame.Surface((98*width/600,height/15-1/300*width))
+    inner_Start.fill((100,100,100))
+    text_Start = Font.render('START GAME', False,(255,255,255))
+    inner_Start.blit(text_Start,(inner_Start.get_width()/15,inner_Start.get_height()/2-15))
+    button_Start.blit(inner_Start,(1/600*width,1/600*width))
+    rect_Start = button_Start.get_rect(topleft=(width*5/12,height*5/10))
+
+    #Options Button
+    button_Options = pygame.Surface((width/6,height/15))
+    button_Options.fill((50,50,50))
+    inner_Options = pygame.Surface((98*width/600,height/15-1/300*width))
+    inner_Options.fill((100,100,100))
+    text_Options = Font.render('OPTIONS', False,(255,255,255))
+    inner_Options.blit(text_Options,(inner_Options.get_width()*2/11,inner_Options.get_height()/2-15))
+    button_Options.blit(inner_Options,(1/600*width,1/600*width))
+    rect_Options = button_Options.get_rect(topleft = (width*5/12,height*6/10))
+
+    #Exit game Button
+    button_Exit = pygame.Surface((width/6,height/15))
+    button_Exit.fill((50,50,50))
+    inner_Exit = pygame.Surface((98*width/600,height/15-1/300*width))
+    inner_Exit.fill((100,100,100))
+    text_Exit = Font.render('EXIT GAME', False,(255,255,255))
+    inner_Exit.blit(text_Exit,(inner_Exit.get_width()/8,inner_Exit.get_height()/2-15))
+    button_Exit.blit(inner_Exit,(1/600*width,1/600*width))
+    rect_Exit = button_Options.get_rect(topleft = (width*5/12,height*7/10))
+
+
+    
+    #Put the elements on the Screen
+    screen.blit(title_surface,(width/2-440,0))
+    screen.blit(button_Start,rect_Start)
+    screen.blit(button_Options,rect_Options)
+    screen.blit(button_Exit,rect_Exit)
+    
+    while True:
+        mouse = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if (event.type == pygame.MOUSEBUTTONUP):
+                if(rect_Start.collidepoint(mouse)):
+                    pass
+                elif(rect_Options.collidepoint(mouse)):
+                    pass
+                elif(rect_Exit.collidepoint(mouse)):
+                    pygame.quit()
+                    exit()
+
+        rect_Start.left += 1
+        
+        if (rect_Start.collidepoint(mouse)):
+            inner_Start.fill((0,0,0))
+        elif(False):
+            pass
+        elif(False):
+            pass
+        clock.tick(60)
+        pygame.display.update()
+
+
+
+        
+    
+
+
 
 def main():
     #Initialize Pygame     
     pygame.init()
     screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
-    
-    
-    
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            
-        pygame.display.update()
+    pygame.display.set_caption('Mega Jogo da Velha')
+    clock = pygame.time.Clock()
+
+
+    #Set the parameters for the creation of the game's screens
+    screen.fill('White')
+
+    title_screen(screen,clock)
 
     
     """moves = ["X","O"]
