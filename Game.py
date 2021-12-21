@@ -8,6 +8,30 @@ from Player import HumanPlayer
 def win():
     pass
 
+def create_settings(number,player,size):
+    width = size[0]
+    height = size[1]
+    right_arrow = pygame.image.load('./images/arrow_right.png')
+    right_arrow = pygame.transform.scale(right_arrow,(height/15,height/15))
+    left_arrow = pygame.image.load('./images/arrow_left.png')
+    left_arrow = pygame.transform.scale(left_arrow,(height/15,height/15))
+    
+    surface = pygame.Surface((width/6,height/15))
+    surface.fill((100,100,100))
+    surface.blit(left_arrow,(0,0))
+    surface.blit(right_arrow,(width/6-height/15,0))
+    font = pygame.font.Font(None,40)
+    if(player):
+        if(number == 0):
+            surface.blit(font.render("Human",False,(255,255,255)),(width*1/18,height/45))
+        elif(number == 1):
+            surface.blit(font.render("Clumsy",False,(255,255,255)),(width*1/18,height/45))
+        elif(number == 2):
+            surface.blit(font.render("RawEater",False,(255,255,255)),(width*1/18,height/45))
+    else:
+        surface.blit(font.render(str(number),False,(255,255,255)),(width*3/36,height/45))
+    return surface
+
 def open_game_settings(screen,clock,deep,board_size,player1,player2):
     width = screen.get_width()
     height = screen.get_height()
@@ -15,21 +39,17 @@ def open_game_settings(screen,clock,deep,board_size,player1,player2):
     #Settings panel
     settings_Surface = pygame.Surface((width/5,height))
     settings_Surface.fill((150,150,150))
-    deep_Surface = pygame.Surface((width/6,height/15))
+    deep_Surface = create_settings(deep,False,(width,height))
     deep_Text = font.render('Depth of the board',False,(255,255,255))
-    deep_Surface.fill((100,100,100))
 
-    size_Surface = pygame.Surface((width/6,height/15))
+    size_Surface = create_settings(board_size,False,(width,height))
     size_Text = font.render('Size of the board',False,(255,255,255))
-    size_Surface.fill((100,100,100))
 
-    player1_Surface = pygame.Surface((width/6,height/15))
+    player1_Surface = create_settings(player1,True,(width,height))
     player1_Text = font.render('Player 1 type',False,(255,255,255))
-    player1_Surface.fill((100,100,100))
 
-    player2_Surface = pygame.Surface((width/6,height/15))
+    player2_Surface = create_settings(player2,True,(width,height))
     player2_Text = font.render('Player 2 type',False,(255,255,255))
-    player2_Surface.fill((100,100,100))
     
     right_arrow = pygame.image.load('./images/arrow_right.png')
     right_arrow = pygame.transform.scale(right_arrow,(height/15,height/15))
@@ -38,9 +58,9 @@ def open_game_settings(screen,clock,deep,board_size,player1,player2):
 
     left_rect = []
     left_rect.append(left_arrow.get_rect(topleft = (49*width/60,3/8*height)))
-    left_rect.append(left_rect[0].copy().move(0,1/8))
-    left_rect.append(left_rect[0].copy().move(0,2/8))
-    left_rect.append(left_rect[0].copy().move(0,3/8))
+    left_rect.append(left_arrow.get_rect(topleft = (49*width/60,4/8*height)))
+    left_rect.append(left_arrow.get_rect(topleft = (49*width/60,5/8*height)))
+    left_rect.append(left_arrow.get_rect(topleft = (49*width/60,6/8*height)))
 
     right_rect = []
     right_rect.append(right_arrow.get_rect(topleft = (29*width/30,3/8*height)))
@@ -87,21 +107,40 @@ def open_game_settings(screen,clock,deep,board_size,player1,player2):
                     if(left_rect[i].collidepoint(mouse)):
                         if(i == 0 and deep > 1):
                             deep -= 1
+                            deep_Surface = create_settings(deep,False,(width,height))
+                            settings_Surface.blit(deep_Surface,(1*width/60,3/8*height))
                         elif(i == 1 and board_size > 0):
                             board_size -= 1
+                            size_Surface = create_settings(board_size,False,(width,height))
+                            settings_Surface.blit(size_Surface,(1*width/60,4/8*height))
                         elif(i == 2 and player1 > 0):
                             player1 -= 1
+                            player1_Surface = create_settings(player1,True,(width,height))
+                            settings_Surface.blit(player1_Surface,(1*width/60,5/8*height))
                         elif(i == 3 and player2 > 0):
                             player2 -= 1
+                            player2_Surface = create_settings(player2,True,(width,height))
+                            settings_Surface.blit(player2_Surface,(1*width/60,6/8*height))
+                        break
                     elif(right_rect[i].collidepoint(mouse)):
                         if(i == 0 and deep < 5):
                             deep += 1
+                            deep_Surface = create_settings(deep,False,(width,height))
+                            settings_Surface.blit(deep_Surface,(1*width/60,3/8*height))
                         elif(i == 1 and board_size < 10):
                             board_size += 1
+                            size_Surface = create_settings(board_size,False,(width,height))
+                            settings_Surface.blit(size_Surface,(1*width/60,4/8*height))
                         elif(i == 2 and player1 < 2):
                             player1 += 1
+                            player1_Surface = create_settings(player1,True,(width,height))
+                            settings_Surface.blit(player1_Surface,(1*width/60,5/8*height))
                         elif(i == 3 and player2 < 2):
                             player2 += 1
+                            player2_Surface = create_settings(player2,True,(width,height))
+                            settings_Surface.blit(player2_Surface,(1*width/60,6/8*height))
+                        break
+                screen.blit(settings_Surface,(4/5*width,0))
                 if(exit_rect.collidepoint(mouse)):
                     settings_Surface.fill((255,255,255))
                     screen.blit(settings_Surface,(4/5*width,0))
