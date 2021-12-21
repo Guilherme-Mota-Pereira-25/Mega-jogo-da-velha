@@ -29,10 +29,13 @@ class TestBoard:
     @pytest.mark.parametrize("vals,bool",[("O,X,O"+
                                           +"X,X,O"+
                                           +"O,O,X",
+
                                            "X,O,X"+
-                                          +"X,")
-                                         ])  
+                                          +"X,X,O"+
+                                          +"X,O,O"), (True, False)])  
     
-    def testTie(board3by3):
-        
-    
+    def testTie(board3by3, vals, bool):
+        v = vals.split(",")
+        for k in range(board3by3.Size*board3by3.Size):
+            board3by3.choose(k%3,k//3,v[k])
+        assert (board3by3.tie() == bool)
