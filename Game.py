@@ -1,14 +1,113 @@
 
 import pygame
 from sys import exit
-#from Player import *
+from Player import *
 import Board
 
 def win():
-    print('a')
-
-def open_game_settings(screen,clock):
     pass
+
+def open_game_settings(screen,clock,deep,board_size,player1,player2):
+    width = screen.get_width()
+    height = screen.get_height()
+    font = pygame.font.Font(None,40)
+    #Settings panel
+    settings_Surface = pygame.Surface((width/5,height))
+    settings_Surface.fill((150,150,150))
+    deep_Surface = pygame.Surface((width/6,height/15))
+    deep_Text = font.render('Depth of the board',False,(255,255,255))
+    deep_Surface.fill((100,100,100))
+
+    size_Surface = pygame.Surface((width/6,height/15))
+    size_Text = font.render('Size of the board',False,(255,255,255))
+    size_Surface.fill((100,100,100))
+
+    player1_Surface = pygame.Surface((width/6,height/15))
+    player1_Text = font.render('Player 1 type',False,(255,255,255))
+    player1_Surface.fill((100,100,100))
+
+    player2_Surface = pygame.Surface((width/6,height/15))
+    player2_Text = font.render('Player 2 type',False,(255,255,255))
+    player2_Surface.fill((100,100,100))
+    
+    right_arrow = pygame.image.load('./images/arrow_right.png')
+    right_arrow = pygame.transform.scale(right_arrow,(height/15,height/15))
+    left_arrow = pygame.image.load('./images/arrow_left.png')
+    left_arrow = pygame.transform.scale(left_arrow,(height/15,height/15))
+
+    left_rect = []
+    left_rect.append(left_arrow.get_rect(topleft = (49*width/60,3/8*height)))
+    left_rect.append(left_rect[0].copy().move(0,1/8))
+    left_rect.append(left_rect[0].copy().move(0,2/8))
+    left_rect.append(left_rect[0].copy().move(0,3/8))
+
+    right_rect = []
+    right_rect.append(right_arrow.get_rect(topleft = (29*width/30,3/8*height)))
+    right_rect.append(right_arrow.get_rect(topleft = (29*width/30,4/8*height)))
+    right_rect.append(right_arrow.get_rect(topleft = (29*width/30,5/8*height)))
+    right_rect.append(right_arrow.get_rect(topleft = (29*width/30,6/8*height)))
+    
+    deep_Surface.blit(left_arrow,(0,0))
+    deep_Surface.blit(right_arrow,(width/6-height/15,0))
+
+    size_Surface.blit(left_arrow,(0,0))
+    size_Surface.blit(right_arrow,(width/6-height/15,0))
+
+    player1_Surface.blit(left_arrow,(0,0))
+    player1_Surface.blit(right_arrow,(width/6-height/15,0))
+
+    player2_Surface.blit(left_arrow,(0,0))
+    player2_Surface.blit(right_arrow,(width/6-height/15,0))
+
+    settings_Surface.blit(left_arrow,(0,0))
+    exit_rect = left_arrow.get_rect(topleft = (4/5*width,0))
+    
+    settings_Surface.blit(deep_Surface,(1*width/60,3/8*height))
+    settings_Surface.blit(deep_Text,(1*width/30,22/64*height))
+    
+    settings_Surface.blit(size_Surface,(1*width/60,4/8*height))
+    settings_Surface.blit(size_Text,(1*width/30,30/64*height))
+    
+    settings_Surface.blit(player1_Surface,(1*width/60,5/8*height))
+    settings_Surface.blit(player1_Text,(1*width/30,38/64*height))
+    
+    settings_Surface.blit(player2_Surface,(1*width/60,6/8*height))
+    settings_Surface.blit(player2_Text,(1*width/30,46/64*height))
+    screen.blit(settings_Surface,(4*width/5,0))
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONUP:
+                mouse = event.pos
+                for i in range(4):
+                    if(left_rect[i].collidepoint(mouse)):
+                        if(i == 0 and deep > 1):
+                            deep -= 1
+                        elif(i == 1 and board_size > 0):
+                            board_size -= 1
+                        elif(i == 2 and player1 > 0):
+                            player1 -= 1
+                        elif(i == 3 and player2 > 0):
+                            player2 -= 1
+                    elif(right_rect[i].collidepoint(mouse)):
+                        if(i == 0 and deep < 5):
+                            deep += 1
+                        elif(i == 1 and board_size < 10):
+                            board_size += 1
+                        elif(i == 2 and player1 < 2):
+                            player1 += 1
+                        elif(i == 3 and player2 < 2):
+                            player2 += 1
+                if(exit_rect.collidepoint(mouse)):
+                    settings_Surface.fill((255,255,255))
+                    screen.blit(settings_Surface,(4/5*width,0))
+                    return (deep,board_size,player1,player2)
+        clock.tick(60)
+        pygame.display.update()
+                
 
 def refresh_board(screen,board):
     #Create screen and board variables
@@ -71,8 +170,7 @@ def refresh_board(screen,board):
             Board_Surface.blit(Mini_Board_Surface,((2/3)*height*(i/size+1/75),(2/3)*height*(j/size+1/75)))
             board = board.go_back()
             
-            temp_Board.append(Mini_Board_Surface.get_rect(topleft = (width/6+(2/3)*height*(i/size+1/75),height/6+(2/3)*height*(j/size+1/75))))    
-        print(temp_Item1[0])    
+            temp_Board.append(Mini_Board_Surface.get_rect(topleft = (width/6+(2/3)*height*(i/size+1/75),height/6+(2/3)*height*(j/size+1/75))))        
         Item_Rect.append(temp_Item1)
         Mini_Board_Rect.append(temp_Board)
      
@@ -107,7 +205,7 @@ def play_game(screen,clock,board):
                 mouse = event.pos
                 if(key == 1):
                     if(len(Item_Rect) == 0):
-                        print('Item_Rect vazio')
+                        pass
                     else:
                         for i in range(size):
                             for j in range(size):
@@ -220,8 +318,10 @@ def title_screen(screen,clock):
     screen.blit(button_Config,rect_Config)
 
 
-     
-
+    deep = 2
+    board_size = 3
+    player1 = 0
+    player2 = 0
 
 
     
@@ -235,7 +335,7 @@ def title_screen(screen,clock):
             if (event.type == pygame.MOUSEBUTTONUP):
                 if(rect_Start.collidepoint(mouse)):
                     screen.fill((255,255,255))
-                    board = Board.Board(3,3,None)   
+                    board = Board.Board(deep,board_size,None)   
                     play_game(screen,clock,board)
                     return
                 elif(rect_Options.collidepoint(mouse)):
@@ -244,8 +344,11 @@ def title_screen(screen,clock):
                     pygame.quit()
                     exit()
                 elif(rect_Config.collidepoint(mouse)):
-                    open_game_settings(screen,clock)
-
+                    settings = open_game_settings(screen,clock,deep,board_size,player1,player2)
+                    deep = settings[0]
+                    board_size = settings[1]
+                    player1 = settings[2]
+                    player2 = settings[3]
         
         clock.tick(60)
         pygame.display.update()
