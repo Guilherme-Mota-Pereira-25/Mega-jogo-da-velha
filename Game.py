@@ -1,16 +1,16 @@
+
 import pygame
 from sys import exit
 #from Player import *
 import Board
 
 def win():
-    pass
+    print('a')
 
 def open_game_settings(screen,clock):
     pass
 
-
-def play_game(screen,clock,board):
+def refresh_board(screen,board):
     #Create screen and board variables
     width = screen.get_width()
     height = screen.get_height()
@@ -22,20 +22,27 @@ def play_game(screen,clock,board):
     Board_Surface.fill((0,0,0))
     Mini_Board_Surface = pygame.Surface((widthMB,widthMB))
     Mini_Board_Surface.fill((150,0,205))
+    Mini_Board_Rect = []
+    Item_Rect = []
 
     
     for i in range(size):
+        temp_Board = []
+        temp_Item1 = []
         for j in range(size):
+            
             board = board.peek(i,j)
-            if(board.isboard()):
+            if(board.Depth>0):
+                temp_Item2 = []
                 for k in range(size):
+                    temp_Item3 = []
                     for l in range(size):
                         board = board.peek(k,l)
                         Item_Surface = None
                         if(board.isboard()):
                             Item_Surface = pygame.image.load('./images/#.xcf')
                         else:
-                            player_item = board.check(k,l)
+                            player_item = board.check()
                             if(player_item == None):
                                 Item_Surface = pygame.Surface((100,100))
                                 Item_Surface.fill((255,255,255))
@@ -44,10 +51,14 @@ def play_game(screen,clock,board):
                             else:
                                 Item_Surface = pygame.image.load('./images/O.xcf')
                         Item_Surface = pygame.transform.scale(Item_Surface,(widthMB*92/(size*100),widthMB*92/(100*size)))
+                        temp_Item3.append(Item_Surface.get_rect(topleft = (width/6+(2/3)*height*(i/size+1/75)+widthMB/size*(k+0.04),height/6+(2/3)*height*(j/size+1/75)+widthMB/size*(l+0.04))))
                         Mini_Board_Surface.blit(Item_Surface,(widthMB/size*(k+0.04),widthMB/size*(l+0.04)))
                         board = board.go_back()
+                    temp_Item2.append(temp_Item3)
+                temp_Item1.append(temp_Item2)
             else:
-                player_item = board.check(i,j)
+
+                player_item = board.check()
                 if(player_item == None):
                     Mini_Board_Surface = pygame.Surface((widthMB,widthMB))
                     Mini_Board_Surface.fill((255,255,255))
@@ -55,23 +66,98 @@ def play_game(screen,clock,board):
                     Mini_Board_Surface = pygame.image.load('./images/X.xcf')
                 else:
                     Mini_Board_Surface = pygame.image.load('./images/O.xcf')
+                Mini_Board_Surface = pygame.transform.scale(Mini_Board_Surface,(widthMB,widthMB))
+                temp_Item1.append(Mini_Board_Surface.get_rect(topleft = (width/6+(2/3)*height*(i/size+1/75),height/6+(2/3)*height*(j/size+1/75))))
+                
             Board_Surface.blit(Mini_Board_Surface,((2/3)*height*(i/size+1/75),(2/3)*height*(j/size+1/75)))
             board = board.go_back()
-                                
-                                
+            
+            temp_Board.append(Mini_Board_Surface.get_rect(topleft = (width/6+(2/3)*height*(i/size+1/75),height/6+(2/3)*height*(j/size+1/75))))    
+        print(temp_Item1[0])    
+        Item_Rect.append(temp_Item1)
+        Mini_Board_Rect.append(temp_Board)
+     
+      
     screen.blit(Board_Surface,(width/6,height/6))
     
+
+    return (Item_Rect,Mini_Board_Rect)
+
+
+
+
+
+
+
+def play_game(screen,clock,board):
+
+    size = board.getSize()
+
+    Rect = refresh_board(screen,board)
+
+    Item_Rect = Rect[0]
+    Mini_Board_Rect = Rect[1]
+        
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             if event.type == pygame.MOUSEBUTTONUP:
-                pass
-        if(board.check != None):
-            win()
+                key = event.button
+                mouse = event.pos
+                if(key == 1):
+                    if(len(Item_Rect) == 0):
+                        print('Item_Rect vazio')
+                    else:
+                        for i in range(size):
+                            for j in range(size):
+                                if(board.check(i,j) == None and Item_Rect[i][j].collidepoint(mouse)):
+                                    board.choose(i,j,'X')
+                                    if(board.complete(i,j)):
+                                        win()
+                                    refresh_board(screen,board)
+                                else:
+                                    for k in range(size):
+                                        for l in range(size):
+                                            if(board.Depth==2 and Item_Rect[i][j][k][l].collidepoint(mouse)):
+                                                board = board.peek(i,j)
+                                                if(board.check(k,l)==None):
+                                                    board.choose(k,l,'X')
+                                                if(board.complete(k,l)):
+                                                    win()
+                                                board = board.go_back()
+                                                refresh_board(screen,board)
+                elif(key == 3):
+                    if(len(Mini_Board_Rect)==0):
+                        pass
+                    else:
+                        for i in range(size):
+                            for j in range(size):
+                                if(board.Depth>1 and Mini_Board_Rect[i][j].collidepoint(mouse)):
+                                    board = board.peek(i,j)
+                                    Rect = refresh_board(screen,board)
+                                    Item_Rect = Rect[0]
+                                    Mini_Board_Rect = Rect[1]
+                                    break
+                            else:
+                                continue
+                            break
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    board = board.go_back()
+                    Rect = refresh_board(screen,board)
+                    Item_Rect = Rect[0]
+                    Mini_Board_Rect = Rect[1]
+                                    
+                
         clock.tick(60)
         pygame.display.update()
+
+
+
+
+        
 
 def title_screen(screen,clock):
     #Get the Screen's size
@@ -150,7 +236,7 @@ def title_screen(screen,clock):
             if (event.type == pygame.MOUSEBUTTONUP):
                 if(rect_Start.collidepoint(mouse)):
                     screen.fill((255,255,255))
-                    board = Board.Board(1,5,None)   
+                    board = Board.Board(3,3,None)   
                     play_game(screen,clock,board)
                     return
                 elif(rect_Options.collidepoint(mouse)):

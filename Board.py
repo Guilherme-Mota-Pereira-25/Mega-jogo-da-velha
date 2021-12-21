@@ -4,17 +4,18 @@ import pytest
 
 class Item():
 
-    def __init__(self):
+    def __init__(self,parent):
         self.State = False
         self.Owner = None
+        self.Parent = parent
+        self.Depth = 0
 
     def isboard(self):
         return False
 
-    def choose(self, Player_Code:str,Player_Color:int):
+    def choose(self, Player_Code:str):
         self.Owner = Player_Code
         self.State = True
-        self.color = Player_Color
         
     def check(self):
         if(self.State):
@@ -28,17 +29,20 @@ class Item():
         else:
             return " "
 
+    def go_back(self):
+        return self.Parent
+
 class Board(Item):
 
     def __init__(self, deep,n,pa):
-        self.Owner = pa
+        self.Owner = None
         self.Status = False
         self.Size = n
         self.Depth = deep
         self.board = []
         self.Parent = pa
         
-        if(self.Depth):
+        if(self.Depth>1):
             for i in range(n):
                 temp_list = []
                 for j in range(n):
@@ -49,24 +53,27 @@ class Board(Item):
             for i in range(n):
                 temp_list = []
                 for j in range(n):
-                    temp_list.append(Item())
+                    temp_list.append(Item(self))
                 self.board.append(temp_list)
                     
                 
                             
             
     def check(self,x,y):
-        return self.board[x][y].check()
+        if(self.board[x][y].isboard()==True):
+            return self.board[x][y].Status
+        else:
+            return self.board[x][y].check()
         
 
     def complete(self, x, y):
         col = True
         line = True
-        selected = self.self.board[x][j].check()
-        for i in range(self.size):
-            if(col and self.self.board[i][y].check() != selected):
+        selected = self.board[x][y].check()
+        for i in range(self.Size):
+            if(col and self.board[i][y].check() != selected):
                 col = False
-            if(line and self.self.board[x][i].check() != selected):
+            if(line and self.board[x][i].check() != selected):
                 line = False
         if(x == y):
             diag = True
@@ -83,11 +90,11 @@ class Board(Item):
                     diag = False
             if(diag):
                 self.State = True
-                self.Owner = selected.check()
+                self.Owner = selected
                 return True
         if(col or line):
             self.State = True
-            self.Owner = selected.check()
+            self.Owner = selected
             return True
         else:
             return self.tie()
@@ -96,14 +103,19 @@ class Board(Item):
         return self.Depth>0
 
     def tie(self):
-        for i in range(self.size):
-            for j in range(self.size):
-                if(self.self.board[i][j].check()==None):
+        for i in range(self.Size):
+            for j in range(self.Size):
+                if(self.board[i][j].check()==None):
                     return False
         return True
+
+    def owning(self,x,y,player):
+        self.board[x][y].Status = True
+        self.board[x][y].Owner = player
+    
                               
     def choose(self, x,y,player):
-        if(self.Depth):
+        if(self.Depth>1):
             print("Esse eh um tabuleiro externo, nao pode selecionar")
         else:
             self.board[x][y].choose(player)
