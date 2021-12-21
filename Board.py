@@ -1,15 +1,15 @@
 from colored import fg, style
 from AuxiliarTypes import Coordinate
+import pytest
 
 class Item():
 
     def __init__(self):
         self.State = False
         self.Owner = None
-        self.isBoard = False
 
     def isboard(self):
-        return self.isBoard
+        return False
 
     def choose(self, Player_Code:str,Player_Color:int):
         self.Owner = Player_Code
@@ -31,13 +31,12 @@ class Item():
 class Board(Item):
 
     def __init__(self, deep,n,pa):
-        self.Owner = None
+        self.Owner = pa
         self.Status = False
         self.Size = n
         self.Depth = deep
         self.board = []
         self.Parent = pa
-        self.isBoard = True
         
         if(self.Depth):
             for i in range(n):
@@ -56,11 +55,8 @@ class Board(Item):
                 
                             
             
-    def check(self):
-        if(self.State or self.complete()):
-            return self.Owner
-        else:
-            return None
+    def check(self,x,y):
+        return self.board[x][y].check()
         
 
     def complete(self, x, y):
@@ -96,6 +92,9 @@ class Board(Item):
         else:
             return self.tie()
 
+    def isboard(self):
+        return self.Depth>0
+
     def tie(self):
         for i in range(self.size):
             for j in range(self.size):
@@ -115,17 +114,10 @@ class Board(Item):
         else:
             print("Nao eh um tabuleiro!")
             return self
-    
-    def peek(self,coord: Coordinate):
-        if(self.Depth):
-            return self.board[coord.getAbscissa()][coord.getOrdinate()]
-        else:
-            print("Nao eh um tabuleiro!")
-            return self
 
     def go_back(self):
-        if(self.parent != None):
-            return self.parent
+        if(self.Parent != None):
+            return self.Parent
         else:
             print("Este eh o tabuleiro mais externo!")
             return self
@@ -134,5 +126,7 @@ class Board(Item):
         return self.Size
     
 if __name__ == "__main__":
-    board = Board(2,3,None)
-    
+    board = Board(3,3,None)
+    board = board.peek(0,0)
+    board = board.peek(0,0)
+    board = board.go_back()

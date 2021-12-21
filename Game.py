@@ -1,7 +1,77 @@
 import pygame
 from sys import exit
-#from Player import *    
+#from Player import *
+import Board
+
+def win():
+    pass
+
+def open_game_settings(screen,clock):
+    pass
+
+
+def play_game(screen,clock,board):
+    #Create screen and board variables
+    width = screen.get_width()
+    height = screen.get_height()
+    size = board.getSize()
+    widthMB = (46/(75*size))*height
     
+    #Create Board
+    Board_Surface = pygame.Surface((2/3*height,2/3*height))
+    Board_Surface.fill((0,0,0))
+    Mini_Board_Surface = pygame.Surface((widthMB,widthMB))
+    Mini_Board_Surface.fill((150,0,205))
+
+    
+    for i in range(size):
+        for j in range(size):
+            board = board.peek(i,j)
+            if(board.isboard()):
+                for k in range(size):
+                    for l in range(size):
+                        board = board.peek(k,l)
+                        Item_Surface = None
+                        if(board.isboard()):
+                            Item_Surface = pygame.image.load('./images/#.xcf')
+                        else:
+                            player_item = board.check(k,l)
+                            if(player_item == None):
+                                Item_Surface = pygame.Surface((100,100))
+                                Item_Surface.fill((255,255,255))
+                            elif(player_item == 'X'):
+                                Item_Surface = pygame.image.load('./images/X.xcf')
+                            else:
+                                Item_Surface = pygame.image.load('./images/O.xcf')
+                        Item_Surface = pygame.transform.scale(Item_Surface,(widthMB*92/(size*100),widthMB*92/(100*size)))
+                        Mini_Board_Surface.blit(Item_Surface,(widthMB/size*(k+0.04),widthMB/size*(l+0.04)))
+                        board = board.go_back()
+            else:
+                player_item = board.check(i,j)
+                if(player_item == None):
+                    Mini_Board_Surface = pygame.Surface((widthMB,widthMB))
+                    Mini_Board_Surface.fill((255,255,255))
+                elif(player_item == 'X'):
+                    Mini_Board_Surface = pygame.image.load('./images/X.xcf')
+                else:
+                    Mini_Board_Surface = pygame.image.load('./images/O.xcf')
+            Board_Surface.blit(Mini_Board_Surface,((2/3)*height*(i/size+1/75),(2/3)*height*(j/size+1/75)))
+            board = board.go_back()
+                                
+                                
+    screen.blit(Board_Surface,(width/6,height/6))
+    
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONUP:
+                pass
+        if(board.check != None):
+            win()
+        clock.tick(60)
+        pygame.display.update()
 
 def title_screen(screen,clock):
     #Get the Screen's size
@@ -10,8 +80,6 @@ def title_screen(screen,clock):
 
     #Setup font
     Font = pygame.font.Font(None,60)
-
-
 
     
     #Create the elements of the screen
@@ -36,7 +104,7 @@ def title_screen(screen,clock):
     text_Options = Font.render('OPTIONS', False,(255,255,255))
     inner_Options.blit(text_Options,(inner_Options.get_width()*2/11,inner_Options.get_height()/2-15))
     button_Options.blit(inner_Options,(1/600*width,1/600*width))
-    rect_Options = button_Options.get_rect(topleft = (width*5/12,height*6/10))
+    rect_Options = button_Options.get_rect(topleft = (width*5/12,height*7/10))
 
     #Exit game Button
     button_Exit = pygame.Surface((width/6,height/15))
@@ -46,8 +114,17 @@ def title_screen(screen,clock):
     text_Exit = Font.render('EXIT GAME', False,(255,255,255))
     inner_Exit.blit(text_Exit,(inner_Exit.get_width()/8,inner_Exit.get_height()/2-15))
     button_Exit.blit(inner_Exit,(1/600*width,1/600*width))
-    rect_Exit = button_Options.get_rect(topleft = (width*5/12,height*7/10))
+    rect_Exit = button_Options.get_rect(topleft = (width*5/12,height*8/10))
 
+    #Configuration Button
+    button_Config = pygame.Surface((width/6,height/15))
+    button_Config.fill((50,50,50))
+    inner_Config = pygame.Surface((width/6-1/300*width,height/15-1/300*width))
+    inner_Config.fill((100,100,100))
+    text_Config = Font.render('SETUP GAME', False,(255,255,255))
+    rect_Config = button_Config.get_rect(topleft = (width*5/12,height*6/10))
+    inner_Config.blit(text_Config,(inner_Config.get_width()/15,inner_Config.get_height()/2-15))
+    button_Config.blit(inner_Config,(1/600*width,1/600*width))
 
     
     #Put the elements on the Screen
@@ -55,6 +132,14 @@ def title_screen(screen,clock):
     screen.blit(button_Start,rect_Start)
     screen.blit(button_Options,rect_Options)
     screen.blit(button_Exit,rect_Exit)
+    screen.blit(button_Config,rect_Config)
+
+
+     
+
+
+
+    
     
     while True:
         mouse = pygame.mouse.get_pos()
@@ -64,21 +149,19 @@ def title_screen(screen,clock):
                 exit()
             if (event.type == pygame.MOUSEBUTTONUP):
                 if(rect_Start.collidepoint(mouse)):
-                    pass
+                    screen.fill((255,255,255))
+                    board = Board.Board(1,5,None)   
+                    play_game(screen,clock,board)
+                    return
                 elif(rect_Options.collidepoint(mouse)):
                     pass
                 elif(rect_Exit.collidepoint(mouse)):
                     pygame.quit()
                     exit()
+                elif(rect_Config.collidepoint(mouse)):
+                    open_game_settings(screen,clock)
 
-        rect_Start.left += 1
         
-        if (rect_Start.collidepoint(mouse)):
-            inner_Start.fill((0,0,0))
-        elif(False):
-            pass
-        elif(False):
-            pass
         clock.tick(60)
         pygame.display.update()
 
@@ -99,8 +182,9 @@ def main():
 
     #Set the parameters for the creation of the game's screens
     screen.fill('White')
-
-    title_screen(screen,clock)
+    option = 0
+    while True:
+        title_screen(screen,clock)
 
     
     """moves = ["X","O"]
