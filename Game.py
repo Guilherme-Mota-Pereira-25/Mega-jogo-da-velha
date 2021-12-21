@@ -25,7 +25,6 @@ def refresh_board(screen,board):
     Mini_Board_Rect = []
     Item_Rect = []
 
-    
     for i in range(size):
         temp_Board = []
         temp_Item1 = []

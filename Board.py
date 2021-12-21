@@ -55,9 +55,7 @@ class Board(Item):
                 for j in range(n):
                     temp_list.append(Item(self))
                 self.board.append(temp_list)
-                    
-                
-                            
+
             
     def check(self,x,y):
         if(self.board[x][y].isboard()==True):
@@ -65,12 +63,12 @@ class Board(Item):
         else:
             return self.board[x][y].check()
         
-
     def complete(self, x, y):
         col = True
         line = True
         selected = self.board[x][y].check()
         for i in range(self.Size):
+
             if(col and self.board[i][y].check() != selected):
                 col = False
             if(line and self.board[x][i].check() != selected):
@@ -103,17 +101,36 @@ class Board(Item):
         return self.Depth>0
 
     def tie(self):
+        # for i in range(self.size):
+        #     for j in range(self.size):
+        #         if(self.check(i,j)==None):
+        #             return False
+        #         elif ()
+        bools = [False, False, False, False]
         for i in range(self.Size):
-            for j in range(self.Size):
-                if(self.board[i][j].check()==None):
-                    return False
-        return True
+            for j in range(1, self.Size):
+                if self.check(i,j-1) != self.check(i,j):
+                    bools[0] = True
+
+        for j in range(self.Size):
+            for i in range(1,self.Size):
+                if self.check(i-1, j) != self.check(i,j):
+                    bools[1] = True
+        
+        for k in range(1, self.Size):
+            if self.check(k-1,k-1) != self.check(k,k):
+                bools[2] = True
+
+        for k in range(self.Size-1,1):
+            if self.check(k+1,k+1) != self.check(k, self.Size - 1 - k):
+                bools[3] = True
+
+        return (True in bools)
 
     def owning(self,x,y,player):
         self.board[x][y].Status = True
         self.board[x][y].Owner = player
-    
-                              
+
     def choose(self, x,y,player):
         if(self.Depth>1):
             print("Esse eh um tabuleiro externo, nao pode selecionar")
