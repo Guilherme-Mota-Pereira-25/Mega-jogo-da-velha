@@ -1,15 +1,15 @@
 import pytest
 
-import Board
+from Board import Board
 
 @pytest.fixture
 def board3by3():
-   return Board(1, 3, None)
+   return Board(2, 3, None)
 
 class TestBoard:
 
     def testIsBoard(board3by3):
-        assert board3by3.isBoard() == True
+        assert (board3by3.isBoard() == True)
     
     # @pytest.mark.parametrize("x,y", [(0,0,0,1,1,1,2,2,2),
     #                                      (0,1,2,0,1,2,0,1,2)])
@@ -26,13 +26,13 @@ class TestBoard:
                     for l in range(2):
                         assert board3by3.peek(i,j).peek(k,l).isBoard() == False
 
-    @pytest.mark.parametrize("vals,bool",[("O,X,O"+
-                                          +"X,X,O"+
-                                          +"O,O,X",
+    @pytest.mark.parametrize("vals,bool",[("O,X,O,"+
+                                           "X,X,O,"+
+                                           "O,O,X",
 
-                                           "X,O,X"+
-                                          +"X,X,O"+
-                                          +"X,O,O"), (True, False)])  
+                                           "X,O,X,"+
+                                           "X,X,O,"+
+                                           "X,O,O,"), (True, False)])  
     
     def testTie(board3by3, vals, bool):
         v = vals.split(",")

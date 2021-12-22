@@ -238,17 +238,30 @@ def play_game(screen,clock,board, player1, player2):
     Mini_Board_Rect = Rect[1]
 
     players = [createPlayer(x) for x in {(player1,0), (player2,1)}]
-
-    turn = 1
-    while True:                        
-        board, successfulPlay = players[turn].play(board, Mini_Board_Rect, Item_Rect)
+    imutable_board = board
+    turn = 0
+    print(players[0])
+    while True:
+        if (type(players[turn]) == HumanPlayer):                        
+            board, successfulPlay, played_position = players[turn].play(board, Mini_Board_Rect, Item_Rect)
+        else:
+            board, successfulPlay, played_position = players[turn].play(imutable_board, Mini_Board_Rect, Item_Rect)
         
+        board: Board; played_position: Coordinate
+        if (played_position != None and board.complete(played_position)):
+            # Código para mudar a célula para o jogador que ganhou
+            board.owning(players[turn])
+            # board.go_back()
+        if (played_position != None):
+            print(board.complete(played_position))
+        
+        # print(type(players[turn]), played_position)
         Rect = refresh_board(screen, board)
         Item_Rect = Rect[0]
         Mini_Board_Rect = Rect[1]
         if (successfulPlay):
             turn = 1 - turn
-
+            # while (board.go_back() != "Este eh o tabuleiro mais externo!"): pass
         clock.tick(60)
         pygame.display.update()        
 

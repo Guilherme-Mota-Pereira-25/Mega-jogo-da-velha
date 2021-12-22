@@ -63,28 +63,33 @@ class Board(Item):
         else:
             return self.board[x][y].check()
         
-    def complete(self, x, y):
+    def complete(self, played_position: Coordinate):
         col = True
         line = True
-        selected = self.board[x][y].check()
+        
+        x, y = played_position.getAbscissa(), played_position.getOrdinate()
+        selected = self.check(x,y)
+        # print(selected)
         for i in range(self.Size):
 
-            if(col and self.board[i][y].check() != selected):
+            if(col and self.check(i,y) != selected):
                 col = False
-            if(line and self.board[x][i].check() != selected):
+            if(line and self.check(x,i) != selected):
                 line = False
         if(x == y):
             diag = True
             for i in range(self.Size):
-                if(diag and self.board[i][i].check() != selected):
+                if(diag and self.check(i,i) != selected):
                     diag = False
             if(diag):
+                # self.State = True
+                # self.Owner = selected
                 return True
         
         if(x == self.Size-1-y):
             diag = True
             for i in range(self.Size):
-                if(diag and self.board[i][self.Size-1-i].check() != selected):
+                if(diag and self.check(i, self.Size-1-i) != selected):
                     diag = False
             if(diag):
                 self.State = True
@@ -94,8 +99,8 @@ class Board(Item):
             self.State = True
             self.Owner = selected
             return True
-        else:
-            return self.tie()
+        # else:
+        #     return self.tie()
 
     def isboard(self):
         return self.Depth>0
@@ -131,6 +136,10 @@ class Board(Item):
         self.board[x][y].Status = True
         self.board[x][y].Owner = player
 
+    def owning(self, player):
+        self.Status = True
+        self.Owner = player
+
     def choose(self, x,y,player):
         if(self.Depth>1):
             print("Esse eh um tabuleiro externo, nao pode selecionar")
@@ -148,7 +157,7 @@ class Board(Item):
         if(self.Parent != None):
             return self.Parent
         else:
-            print("Este eh o tabuleiro mais externo!")
+            # print("Este eh o tabuleiro mais externo!")
             return self
 
     def getSize(self):

@@ -19,3 +19,6 @@ class Coordinate:
     def setOrdinate(self, new_y: int) -> None:
         "Coloca-se um novo valor para a abscissa da Coordenada"
         self.y = new_y
+
+    def __str__(self) -> str:
+        return f"(x: {self.x},y: {self.y})"

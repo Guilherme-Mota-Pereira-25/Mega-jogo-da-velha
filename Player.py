@@ -1,5 +1,6 @@
+from typing import Tuple
 from AuxiliarTypes import Coordinate
-import Board
+from Board import Board
 from random import randint
 import pygame
 
@@ -19,10 +20,11 @@ class HumanPlayer(Player):
     def __init__(self, character: str):
         super().__init__(character)
     
-    def play(self, board: Board, Mini_Board_Rect: list, Item_Rect: list):
+    def play(self, board: Board, Mini_Board_Rect: list, Item_Rect: list) -> Tuple[Board,bool,Coordinate]:
         '''Função que requisita ao jogador uma jogada.'''
         size = board.getSize()
         successfulPlay = False
+        played_position = None
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -39,7 +41,9 @@ class HumanPlayer(Player):
                             for j in range(size):
                                 if(board.check(i,j) == None and Item_Rect[i][j].collidepoint(mouse)):
                                     # turn = 1 - turn
+                                    played_position = Coordinate(i,j)
                                     board.choose(i,j,self.getCharacter())
+                                    played_position.setAbscissa(i); played_position.setOrdinate(j)
                                     successfulPlay = True
                                     # if(board.complete(i,j)):
                                     #     win()
@@ -53,6 +57,8 @@ class HumanPlayer(Player):
                                                     # turn = 1 - turn
                                                     successfulPlay = True
                                                     board.choose(k,l, self.getCharacter())
+                                                    played_position = Coordinate(k,l)
+                                                    # played_position.setAbscissa(k); played_position.setOrdinate(l)
                                                 # if(board.complete(k,l)):
                                                 #     win()
                                                 board = board.go_back()
@@ -79,7 +85,7 @@ class HumanPlayer(Player):
                     # Item_Rect = Rect[0]
                     # Mini_Board_Rect = Rect[1]
         
-        return (board,successfulPlay)
+        return (board.go_back(),successfulPlay, played_position)
         # sucessful_play = False
         # M_i, M_j = 0, 0
         # while not sucessful_play:
@@ -101,28 +107,29 @@ class ClumsyPlayer(Player):
     def __init__(self, character: str) -> None:
         super().__init__(character)
 
-    def play(self, board: Board) -> Coordinate:
+    def play(self, board: Board, Mini_Board_Rect: list, Item_Rect: list) -> Coordinate:
         successful_play = False
         M_i, M_j = 0, 0
         while not successful_play:
-            M_i, M_j = randint(2), randint(2)
-            if (not board.peek(M_i,M_j).check() == None):
+            M_i, M_j = (randint(0, 2), randint(0, 2))
+            if (board.check(M_i,M_j)):
                 continue
-
-            m_i, m_j = randint(2), randint(2)
-            if (not board.peek(M_i, M_j).peek(m_i.m_j).check() == None):
+              
+            print(M_i,M_j)
+            m_i, m_j = (randint(0, 2), randint(0, 2))
+            if (board.peek(M_i, M_j).check(m_i,m_j)):
                 continue
-
-            board.peek(M_i, M_j).peek(m_i.m_j).choose(self.character)
+ 
+            board.peek(M_i, M_j).peek(m_i, m_j).choose(self.character)
             successful_play = True
-        return Coordinate(M_i, M_j)
+        return (board, successful_play, Coordinate(M_i,M_j))
 
 class RawEaterPlayer(Player):
 
     def __init__(self, character: str) -> None:
         super().__init__(character)
 
-    def play(self, board: Board) -> Coordinate:
+    def play(self, board: Board, Mini_Board_Rect: list, Item_Rect: list): 
         '''Função que joga conforme um jogador come-crú
         Assume-se que o tabuleiro ainda não está completo e que ainda há espaços em que se pode jogar
         
@@ -131,18 +138,12 @@ class RawEaterPlayer(Player):
         Retorno:
         - Coordinate (Coordenada da célula do macro-tabuleiro em que o jogador jogou)'''
         pos_Macro = 0
-        while not board.isValid(pos_Macro//3,pos_Macro%3): pos_Macro = pos_Macro+1
-        pos_Macro_x, pos_Macro_y = pos_Macro//3, pos_Macro%3
+        while (board.check(pos_Macro%3, pos_Macro//3)): pos_Macro = pos_Macro+1
+        pos_Macro_y, pos_Macro_x = pos_Macro//3, pos_Macro%3
+        
         pos_micro = 0
-        while pos_micro < 9 and not board.peek(pos_Macro_x,pos_Macro_y).peek(pos_micro//3, pos_micro%3): pos_micro = pos_micro+1
-        if (pos_micro != 9):
-            board.peek(pos_Macro_x,pos_Macro_y).peek(pos_micro//3,pos_micro%3).peek(self.character)
-        return Coordinate(pos_Macro_x, pos_Macro_y)
-
-class EasyAIPlayer(Player):
-    
-    def __init__(self, character: str):
-        super().__init__(character)
-    
-    def play(self, board: Board) -> Coordinate:
-        return super().play()
+        while pos_micro < 9 and board.peek(pos_Macro_x,pos_Macro_y).check(pos_micro%3, pos_micro//3): pos_micro = pos_micro+1
+        # if (pos_micro != 9):
+        board.peek(pos_Macro_x,pos_Macro_y).peek(pos_micro%3, pos_micro//3).choose(self.character)
+        
+        return (board, True, Coordinate(pos_Macro_x,pos_Macro_y))
