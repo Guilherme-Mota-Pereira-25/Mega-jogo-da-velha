@@ -23,7 +23,6 @@ def play_game(screen,clock,board):
     Mini_Board_Surface = pygame.Surface((widthMB,widthMB))
     Mini_Board_Surface.fill((150,0,205))
 
-    
     for i in range(size):
         for j in range(size):
             board = board.peek(i,j)
