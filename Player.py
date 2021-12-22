@@ -1,14 +1,14 @@
-from typing import Tuple
 from AuxiliarTypes import Coordinate
 import Board
 from random import randint
+import pygame
 
 class Player:
 
     def __init__(self,  character: str):
         self.character = character
 
-    def play(self, board: Board) -> Coordinate:
+    def play(self, board: Board, Mini_Board_Rect: list, Item_Rect: list) -> Coordinate:
         pass
 
     def getCharacter(self) -> str:
@@ -19,24 +19,82 @@ class HumanPlayer(Player):
     def __init__(self, character: str):
         super().__init__(character)
     
-    def play(self, board: Board) -> bool:
+    def play(self, board: Board, Mini_Board_Rect: list, Item_Rect: list):
         '''Função que requisita ao jogador uma jogada.'''
+        size = board.getSize()
+        successfulPlay = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONUP:
 
-        sucessful_play = False
-        M_i, M_j = 0, 0
-        while not sucessful_play:
-            _input = (int(x) for x in input().split())
-            valid_input = True
-            for i in _input: 
-                if (not 0 <= i <= 2):
-                    valid_input = False; break
-            if (not valid_input): 
-                print("Input não é válido! Tente novamente:")
-                continue
+                key = event.button
+                mouse = event.pos
+                if(key == 1):
+                    if(len(Item_Rect) == 0):
+                        pass
+                    else:
+                        for i in range(size):
+                            for j in range(size):
+                                if(board.check(i,j) == None and Item_Rect[i][j].collidepoint(mouse)):
+                                    # turn = 1 - turn
+                                    board.choose(i,j,self.getCharacter())
+                                    successfulPlay = True
+                                    # if(board.complete(i,j)):
+                                    #     win()
+                                    # refresh_board(screen,board)
+                                else:
+                                    for k in range(size):
+                                        for l in range(size):
+                                            if(board.Depth==2 and Item_Rect[i][j][k][l].collidepoint(mouse)):
+                                                board = board.peek(i,j)
+                                                if(board.check(k,l)==None):
+                                                    # turn = 1 - turn
+                                                    successfulPlay = True
+                                                    board.choose(k,l, self.getCharacter())
+                                                # if(board.complete(k,l)):
+                                                #     win()
+                                                board = board.go_back()
+                                                # refresh_board(screen,board)
+                elif(key == 3):
+                    if(len(Mini_Board_Rect)==0):
+                        pass
+                    else:
+                        for i in range(size):
+                            for j in range(size):
+                                if(board.Depth>1 and Mini_Board_Rect[i][j].collidepoint(mouse)):
+                                    board = board.peek(i,j)
+                                    # Rect = refresh_board(screen,board)
+                                    # Item_Rect = Rect[0]
+                                    # Mini_Board_Rect = Rect[1]
+                                    break
+                            else:
+                                continue
+                            break
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    board = board.go_back()
+                    # Rect = refresh_board(screen,board)
+                    # Item_Rect = Rect[0]
+                    # Mini_Board_Rect = Rect[1]
+        
+        return (board,successfulPlay)
+        # sucessful_play = False
+        # M_i, M_j = 0, 0
+        # while not sucessful_play:
+        #     _input = (int(x) for x in input().split())
+        #     valid_input = True
+        #     for i in _input: 
+        #         if (not 0 <= i <= 2):
+        #             valid_input = False; break
+        #     if (not valid_input): 
+        #         print("Input não é válido! Tente novamente:")
+        #         continue
 
-            board.peek(_input[0], _input[1]).peek(_input[2], _input[3]).choose(self.character)
-            sucessful_play = True
-        return Coordinate(M_i, M_j)
+        #     board.peek(_input[0], _input[1]).peek(_input[2], _input[3]).choose(self.character)
+        #     sucessful_play = True
+        # return Coordinate(M_i, M_j)
 
 class ClumsyPlayer(Player):    
 

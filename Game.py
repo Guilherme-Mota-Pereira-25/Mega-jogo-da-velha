@@ -1,4 +1,5 @@
 
+from typing import Tuple
 import pygame
 from sys import exit
 from Player import *
@@ -146,8 +147,7 @@ def open_game_settings(screen,clock,deep,board_size,player1,player2):
                     screen.blit(settings_Surface,(4/5*width,0))
                     return (deep,board_size,player1,player2)
         clock.tick(60)
-        pygame.display.update()
-                
+        pygame.display.update()          
 
 def refresh_board(screen,board):
     #Create screen and board variables
@@ -218,7 +218,17 @@ def refresh_board(screen,board):
     
     return (Item_Rect,Mini_Board_Rect)
 
-def play_game(screen,clock,board):
+def createPlayer(tuple_player_move: Tuple) -> Player:
+    moves = ["X","O"]
+    int_player, move = tuple_player_move
+    if (int_player == 0):
+        return HumanPlayer(moves[move])
+    elif (int_player == 1):
+        return ClumsyPlayer(moves[move])
+    elif (int_player == 2):
+        return RawEaterPlayer(moves[move])
+
+def play_game(screen,clock,board, player1, player2):
 
     size = board.getSize()
 
@@ -227,66 +237,18 @@ def play_game(screen,clock,board):
     Item_Rect = Rect[0]
     Mini_Board_Rect = Rect[1]
 
-    # Modificar com o nome do método:
-    players = [HumanPlayer("X"), HumanPlayer("O")]
-    
-    turn = 0
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.MOUSEBUTTONUP:
-                key = event.button
-                mouse = event.pos
-                if(key == 1):
-                    if(len(Item_Rect) == 0):
-                        pass
-                    else:
-                        for i in range(size):
-                            for j in range(size):
-                                if(board.check(i,j) == None and Item_Rect[i][j].collidepoint(mouse)):
-                                    # Modificar aqui
-                                    turn = 1 - turn
-                                    board.choose(i,j,players[turn].getCharacter())
-                                    if(board.complete(i,j)):
-                                        win()
-                                    refresh_board(screen,board)
-                                else:
-                                    for k in range(size):
-                                        for l in range(size):
-                                            if(board.Depth==2 and Item_Rect[i][j][k][l].collidepoint(mouse)):
-                                                board = board.peek(i,j)
-                                                if(board.check(k,l)==None):
-                                                    turn = 1 - turn
-                                                    board.choose(k,l, players[turn].getCharacter())
-                                                if(board.complete(k,l)):
-                                                    win()
-                                                board = board.go_back()
-                                                refresh_board(screen,board)
-                elif(key == 3):
-                    if(len(Mini_Board_Rect)==0):
-                        pass
-                    else:
-                        for i in range(size):
-                            for j in range(size):
-                                if(board.Depth>1 and Mini_Board_Rect[i][j].collidepoint(mouse)):
-                                    board = board.peek(i,j)
-                                    Rect = refresh_board(screen,board)
-                                    Item_Rect = Rect[0]
-                                    Mini_Board_Rect = Rect[1]
-                                    break
-                            else:
-                                continue
-                            break
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    board = board.go_back()
-                    Rect = refresh_board(screen,board)
-                    Item_Rect = Rect[0]
-                    Mini_Board_Rect = Rect[1]
-                                    
-                
+    players = [createPlayer(x) for x in {(player1,0), (player2,1)}]
+
+    turn = 1
+    while True:                        
+        board, successfulPlay = players[turn].play(board, Mini_Board_Rect, Item_Rect)
+        
+        Rect = refresh_board(screen, board)
+        Item_Rect = Rect[0]
+        Mini_Board_Rect = Rect[1]
+        if (successfulPlay):
+            turn = 1 - turn
+
         clock.tick(60)
         pygame.display.update()        
 
@@ -365,7 +327,7 @@ def title_screen(screen,clock):
                 if(rect_Start.collidepoint(mouse)):
                     screen.fill((255,255,255))
                     board = Board.Board(deep,board_size,None)   
-                    play_game(screen,clock,board)
+                    play_game(screen,clock,board, player1, player2)
                     return
                 elif(rect_Options.collidepoint(mouse)):
                     pass
