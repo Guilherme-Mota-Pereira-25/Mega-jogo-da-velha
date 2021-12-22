@@ -11,6 +11,9 @@ class Player:
     def play(self, board: Board) -> Coordinate:
         pass
 
+    def getCharacter(self) -> str:
+        return self.character
+
 class HumanPlayer(Player):
 
     def __init__(self, character: str):

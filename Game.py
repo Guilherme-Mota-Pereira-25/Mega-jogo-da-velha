@@ -3,6 +3,7 @@ import pygame
 from sys import exit
 #from Player import *
 import Board
+from Player import HumanPlayer
 
 def win():
     print('a')
@@ -75,18 +76,10 @@ def refresh_board(screen,board):
         print(temp_Item1[0])    
         Item_Rect.append(temp_Item1)
         Mini_Board_Rect.append(temp_Board)
-     
-      
+       
     screen.blit(Board_Surface,(width/6,height/6))
     
-
     return (Item_Rect,Mini_Board_Rect)
-
-
-
-
-
-
 
 def play_game(screen,clock,board):
 
@@ -96,7 +89,11 @@ def play_game(screen,clock,board):
 
     Item_Rect = Rect[0]
     Mini_Board_Rect = Rect[1]
-        
+
+    # Modificar com o nome do método:
+    players = [HumanPlayer("X"), HumanPlayer("O")]
+    
+    turn = 0
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -112,7 +109,9 @@ def play_game(screen,clock,board):
                         for i in range(size):
                             for j in range(size):
                                 if(board.check(i,j) == None and Item_Rect[i][j].collidepoint(mouse)):
-                                    board.choose(i,j,'X')
+                                    # Modificar aqui
+                                    turn = 1 - turn
+                                    board.choose(i,j,players[turn].getCharacter())
                                     if(board.complete(i,j)):
                                         win()
                                     refresh_board(screen,board)
@@ -122,7 +121,8 @@ def play_game(screen,clock,board):
                                             if(board.Depth==2 and Item_Rect[i][j][k][l].collidepoint(mouse)):
                                                 board = board.peek(i,j)
                                                 if(board.check(k,l)==None):
-                                                    board.choose(k,l,'X')
+                                                    turn = 1 - turn
+                                                    board.choose(k,l, players[turn].getCharacter())
                                                 if(board.complete(k,l)):
                                                     win()
                                                 board = board.go_back()
@@ -151,12 +151,7 @@ def play_game(screen,clock,board):
                                     
                 
         clock.tick(60)
-        pygame.display.update()
-
-
-
-
-        
+        pygame.display.update()        
 
 def title_screen(screen,clock):
     #Get the Screen's size
@@ -165,7 +160,6 @@ def title_screen(screen,clock):
 
     #Setup font
     Font = pygame.font.Font(None,60)
-
     
     #Create the elements of the screen
     #Title
@@ -219,13 +213,6 @@ def title_screen(screen,clock):
     screen.blit(button_Exit,rect_Exit)
     screen.blit(button_Config,rect_Config)
 
-
-     
-
-
-
-    
-    
     while True:
         mouse = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -245,17 +232,9 @@ def title_screen(screen,clock):
                     exit()
                 elif(rect_Config.collidepoint(mouse)):
                     open_game_settings(screen,clock)
-
         
         clock.tick(60)
         pygame.display.update()
-
-
-
-        
-    
-
-
 
 def main():
     #Initialize Pygame     
@@ -264,13 +243,11 @@ def main():
     pygame.display.set_caption('Mega Jogo da Velha')
     clock = pygame.time.Clock()
 
-
     #Set the parameters for the creation of the game's screens
     screen.fill('White')
     option = 0
     while True:
         title_screen(screen,clock)
-
     
     """moves = ["X","O"]
     print("Bem vindo ao Mega jogo da velha!\nInicialmente, configure o jogo.")
