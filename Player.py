@@ -39,7 +39,8 @@ class HumanPlayer(Player):
                     else:
                         for i in range(size):
                             for j in range(size):
-                                if(board.check(i,j) == None and Item_Rect[i][j].collidepoint(mouse)):
+                                board = board.peek(i,j)
+                                if(not board.isboard() and Item_Rect[i][j].collidepoint(mouse)):
                                     # turn = 1 - turn
                                     played_position = Coordinate(i,j)
                                     board.choose(i,j,self.getCharacter())
@@ -51,18 +52,17 @@ class HumanPlayer(Player):
                                 else:
                                     for k in range(size):
                                         for l in range(size):
-                                            if(board.Depth==2 and Item_Rect[i][j][k][l].collidepoint(mouse)):
-                                                board = board.peek(i,j)
-                                                if(board.check(k,l)==None):
+                                            if(type(Item_Rect[i][j]) != pygame.Rect and Item_Rect[i][j][k][l].collidepoint(mouse)):
+                                                if(board.check(k,l) == None):
                                                     # turn = 1 - turn
                                                     successfulPlay = True
-                                                    board.choose(k,l, self.getCharacter())
+                                                    board.choose(k,l,self.getCharacter())
                                                     played_position = Coordinate(k,l)
                                                     # played_position.setAbscissa(k); played_position.setOrdinate(l)
-                                                # if(board.complete(k,l)):
-                                                #     win()
-                                                board = board.go_back()
+                                                    # if(board.complete(k,l)):
+                                                    #     win()
                                                 # refresh_board(screen,board)
+                                board = board.go_back()
                 elif(key == 3):
                     if(len(Mini_Board_Rect)==0):
                         pass
@@ -115,7 +115,7 @@ class ClumsyPlayer(Player):
             if (board.check(M_i,M_j)):
                 continue
               
-            print(M_i,M_j)
+            
             m_i, m_j = (randint(0, 2), randint(0, 2))
             if (board.peek(M_i, M_j).check(m_i,m_j)):
                 continue

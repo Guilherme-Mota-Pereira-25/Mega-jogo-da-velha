@@ -6,8 +6,12 @@ from Player import *
 import Board
 from Player import HumanPlayer
 
-def win():
-    pass
+def win(screen,player):
+    height = screen.get_heigth()
+    width = screen.get_width()
+    win_Surface = pygame.Surface((width*2/3,height*2/3))
+    win_Surface.fill((100,100,100))
+    screen.blit(win_Surface,(width*1/6,height*1/6))
 
 def create_settings(number,player,size):
     width = size[0]
@@ -155,22 +159,26 @@ def refresh_board(screen,board):
     height = screen.get_height()
     size = board.getSize()
     widthMB = (46/(75*size))*height
+    aqui = False
     
     #Create Board
     Board_Surface = pygame.Surface((2/3*height,2/3*height))
     Board_Surface.fill((0,0,0))
-    Mini_Board_Surface = pygame.Surface((widthMB,widthMB))
-    Mini_Board_Surface.fill((150,0,205))
     Mini_Board_Rect = []
     Item_Rect = []
-
+    #print(board.check())
+    if(board.check() == 'X' or board.check() == 'O'):
+        #print('Achei')
+        board = win(screen,board.Owner)
     for i in range(size):
         temp_Board = []
         temp_Item1 = []
         for j in range(size):
             
             board = board.peek(i,j)
-            if(board.Depth>0):
+            if(board.Depth>0 and not board.Status):
+                Mini_Board_Surface = pygame.Surface((widthMB,widthMB))
+                Mini_Board_Surface.fill((150,0,205))
                 temp_Item2 = []
                 for k in range(size):
                     temp_Item3 = []
@@ -195,7 +203,6 @@ def refresh_board(screen,board):
                     temp_Item2.append(temp_Item3)
                 temp_Item1.append(temp_Item2)
             else:
-
                 player_item = board.check()
                 if(player_item == None):
                     Mini_Board_Surface = pygame.Surface((widthMB,widthMB))
@@ -213,7 +220,7 @@ def refresh_board(screen,board):
             temp_Board.append(Mini_Board_Surface.get_rect(topleft = (width/6+(2/3)*height*(i/size+1/75),height/6+(2/3)*height*(j/size+1/75))))        
         Item_Rect.append(temp_Item1)
         Mini_Board_Rect.append(temp_Board)
-       
+            
     screen.blit(Board_Surface,(width/6,height/6))
     
     return (Item_Rect,Mini_Board_Rect)
@@ -240,7 +247,6 @@ def play_game(screen,clock,board, player1, player2):
     players = [createPlayer(x) for x in {(player1,0), (player2,1)}]
     imutable_board = board
     turn = 0
-    print(players[0])
     while True:
         if (type(players[turn]) == HumanPlayer):                        
             board, successfulPlay, played_position = players[turn].play(board, Mini_Board_Rect, Item_Rect)
@@ -248,12 +254,12 @@ def play_game(screen,clock,board, player1, player2):
             board, successfulPlay, played_position = players[turn].play(imutable_board, Mini_Board_Rect, Item_Rect)
         
         board: Board; played_position: Coordinate
-        if (played_position != None and board.complete(played_position)):
+        if (played_position != None):
             # Código para mudar a célula para o jogador que ganhou
             board.owning(players[turn])
             # board.go_back()
         if (played_position != None):
-            print(board.complete(played_position))
+            pass
         
         # print(type(players[turn]), played_position)
         Rect = refresh_board(screen, board)
