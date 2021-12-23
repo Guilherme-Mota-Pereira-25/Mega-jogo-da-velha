@@ -6,7 +6,7 @@ Com exceção das imagens, todos os arquivos se encontram no mesmo diretório
 
 ## Compilação
 
-Para executar o jogo, execute:
+Para executar o jogo, entre no diretório e execute:
 
 `python3 Game.py`
 
@@ -37,5 +37,12 @@ No momento em que você clicar nesse botão, a board aparecerá. Com isso, você
 **b) Apertar espaço:** Esta ação desfazerá a ampliação feita por um botão direito, de modo a te levar ao tabuleiro superior em relação a uma célula.
 
 **c) Clicar em uma célula:** Ao clicar em uma célula, o jogo colocará a marcação correspondente ao do jogador.
+
+## Testes
+
+Efetuou-se testes para duas classes: Coordinate e Board. A fim de enxergar os testes - uma vez dentro do diretório -, rode:
+
+`pytest TestAuxiliarTypes.py`
+`pytest TestBoard.py`
 
 O jogo progredirá na medida em que os jogadores, quer humanos ou não, jogarem e, ao finalizar, o jogo congelará no tabuleiro cuja configuração é a do vencedor.
